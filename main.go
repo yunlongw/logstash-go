@@ -1,10 +1,10 @@
 package main
 
 import (
-	"log"
-	"net/http"
 	"io/ioutil"
+	"log"
 	"net"
+	"net/http"
 	"runtime"
 )
 
@@ -23,6 +23,7 @@ func httpLogServer() {
 	})
 
 	log.Println(">>> HTTP - POST至 http://ip:9090/write")
+	//开启 9090 端口监听
 	http.ListenAndServe(":9090", nil)
 }
 
