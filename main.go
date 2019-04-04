@@ -22,13 +22,13 @@ func httpLogServer() {
 		h.broadcast <- bodyByte
 	})
 
-	log.Println(">>> HTTP - POST至 http://ip:9090/write")
+	log.Println(">>> HTTP - POST至 http://ip:9192/write")
 	//开启 9090 端口监听
-	http.ListenAndServe(":9090", nil)
+	http.ListenAndServe(":9192", nil)
 }
 
 func udpLogServer() {
-	addr, err := net.ResolveUDPAddr("udp4", ":9091")
+	addr, err := net.ResolveUDPAddr("udp4", ":9093")
 	if err != nil {
 		log.Printf("net.ResolveUDPAddr error %q", err)
 	}
@@ -39,7 +39,7 @@ func udpLogServer() {
 	}
 
 	defer l.Close()
-	log.Println(">>> UDP - 转发至 upd://ip:9091")
+	log.Println(">>> UDP - 转发至 upd://ip:9093")
 	for {
 		buf := make([]byte, 40960)
 		length, _, err := l.ReadFrom(buf)

@@ -47,11 +47,20 @@
         <div class="panel-body row">
             <div class="col-lg-6">
                 <div class="input-group">
+                    <div class="input-group-btn">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action<span class="caret"></span></button>
+                        <ul class="dropdown-menu">
+                            <li><a v-on:click="action($event, 'ws://13.229.127.162:9191')"> Aws Server </a></li>
+                            <li><a v-on:click="action($event, 'ws://118.24.73.104:9191')"> TX Server </a></li>
+                        </ul>
+                    </div>
+                    <!-- /btn-group -->
                     <input type="text" v-model="server" class="form-control" placeholder="ws://server:9191">
+
                     <span class="input-group-btn">
-                <button id="connect" class="btn btn-default" v-on:click="ws_connect()" type="button">确定</button>
-                <button class="btn btn-default" v-on:click="showAllTag()" type="button">showAll</button>
-                </span>
+                        <button id="connect" class="btn btn-default" v-on:click="ws_connect()" type="button">确定</button>
+                        <button class="btn btn-default" v-on:click="showAllTag()" type="button">showAll</button>
+                    </span>
                 </div>
             </div>
         </div>
@@ -80,7 +89,7 @@
     </div>
     <div id="footer">
         <div id="filterTag">
-            <div class="col-lg-1"  style="margin: 1px" v-on:click="showTag(v)" v-for="v in tags">
+            <div class="col-lg-1" style="margin: 1px" v-on:click="showTag(v)" v-for="v in tags">
                 <span class="label label-info"> {{ v }}</span>
             </div>
         </div>
@@ -104,7 +113,7 @@
             message_data: [], //全部数据
             status: '',
             tags: [],
-            current_tag : '',
+            current_tag: '',
         },
         methods: {
             ws_connect: function () {
@@ -132,7 +141,7 @@
                     ws.onmessage = function (event) {
                         // console.log(event.data);
                         var tag = '';
-                        var  d = {};
+                        var d = {};
                         var t = event.data;
                         var date = new Date();
                         var time = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
@@ -141,16 +150,16 @@
 
                         var data_message = JSON.parse(data);
                         d.data = data_message['data'];
-                        if (match.hasOwnProperty('get')  && match['get'] !== '') {
+                        if (match.hasOwnProperty('get') && match['get'] !== '') {
                             d.get = match['get'];
                         }
                         if (match.hasOwnProperty('post') && match['post'] !== '') {
                             d.post = match['post'];
                         }
-                        if (match.hasOwnProperty('cookie')  && match['cookie'] !== '') {
+                        if (match.hasOwnProperty('cookie') && match['cookie'] !== '') {
                             d.cookie = match['cookie'];
                         }
-                        if (match.hasOwnProperty('session')  && match['session'] !== '') {
+                        if (match.hasOwnProperty('session') && match['session'] !== '') {
                             d.session = match['session'];
                         }
                         tag = data_message['name'];
@@ -165,10 +174,10 @@
                             time: data_message['current_time']
                         });
 
-                        if (app.current_tag === ''){
+                        if (app.current_tag === '') {
                             app.message = app.message_data;
-                        }else {
-                            if (app.current_tag === tag){
+                        } else {
+                            if (app.current_tag === tag) {
                                 app.message.push({
                                     tag: tag,
                                     text: t,
@@ -254,6 +263,10 @@
                 setTimeout(function () {
                     $("#alert").hide();
                 }, 2000)
+            },
+            action: function ($event, $msg) {
+                app.server = $msg;
+                this.ws_connect();
             }
         }
     });
