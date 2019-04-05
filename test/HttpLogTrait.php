@@ -25,8 +25,8 @@ trait HttpLogTrait
      */
     function connect()
     {
-        $this->station_server = config('udplog.HTTP_LOG_SERVER') ?? "127.0.0.1";
-        $this->port = config('udplog.HTTP_LOG_PORT') ?? "9091";
+        $this->station_server = env('HTTP_LOG_SERVER') ?? "127.0.0.1";
+        $this->port = env('HTTP_LOG_PORT') ?? "9091";
 
         $fp = fsockopen($this->station_server, $this->port, $error_no, $error_string, $this->timeout);
         if (!$fp) {
