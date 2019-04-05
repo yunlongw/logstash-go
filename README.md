@@ -66,3 +66,6 @@ class Test extends Command
 }
 ?>
 ```
+
+
+## 6、服务器应该打开对应的端口配置供应商的防火墙规则
