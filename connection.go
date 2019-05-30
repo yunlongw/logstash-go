@@ -55,24 +55,23 @@ func wbServerHandler(w http.ResponseWriter, r *http.Request)  {
 	if err != nil {
 		// handle error
 	}
-	go func() {
-		defer conn.Close()
 
-		for {
-			msg, op, err := wsutil.ReadClientData(conn)
-			if err != nil {
-				// handle error
-				//fmt.Println(1)
-			}
-			err = wsutil.WriteServerMessage(conn, op, msg)
-			if err != nil {
-				// handle error
-				//fmt.Println(2)
-			}
+	defer conn.Close()
 
-			h.broadcastWeb <- msg
+	for {
+		msg, op, err := wsutil.ReadClientData(conn)
+		if err != nil {
+			// handle error
+			//fmt.Println(1)
 		}
-	}()
+		err = wsutil.WriteServerMessage(conn, op, msg)
+		if err != nil {
+			// handle error
+			//fmt.Println(2)
+		}
+
+		h.broadcastWeb <- msg
+	}
 
 	//bodyByte, _ := ioutil.ReadAll(r.Body)
 	//h.broadcast <- bodyByte

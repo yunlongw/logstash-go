@@ -71,7 +71,7 @@ func main() {
 	go h.run()
 
 	//开始接受 websocket 日志
-	http.ListenAndServe(":9194",  http.HandlerFunc(wbServerHandler))
+	go http.ListenAndServe(":9194",  http.HandlerFunc(wbServerHandler))
 	log.Println(">>> Websocket - 至 http://ip:9194/write")
 
 	//通过ws发送给客户端
