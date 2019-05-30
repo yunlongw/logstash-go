@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gobwas/ws"
 	"github.com/gobwas/ws/wsutil"
 	"log"
 	"net"
 	"net/http"
+	"strings"
 )
 
 type connection struct {
@@ -48,7 +50,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 	c.write()
 }
 
-func wbServerHandler(w http.ResponseWriter, r *http.Request)  {
+func wbServerHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println(">>> Websocket - 至 http://ip:9393/write")
 
 	conn, _, _, err := ws.UpgradeHTTP(r, w)
@@ -77,3 +79,34 @@ func wbServerHandler(w http.ResponseWriter, r *http.Request)  {
 	//h.broadcast <- bodyByte
 
 }
+
+
+func connHandler(c net.Conn) {
+	if c == nil {
+		return
+	}
+	buf := make([]byte, 4096)
+	for {
+		cnt, err := c.Read(buf)
+		if err != nil || cnt == 0 {
+			c.Close()
+			break
+		}
+		inStr := strings.TrimSpace(string(buf[0:cnt]))
+		inputs := strings.Split(inStr, " ")
+		switch inputs[0] {
+		case "ping":
+			c.Write([]byte("pong\n"))
+		case "echo":
+			echoStr := strings.Join(inputs[1:], " ") + "\n"
+			c.Write([]byte(echoStr))
+		case "quit":
+			c.Close()
+			break
+		default:
+			fmt.Printf("Unsupported command: %s\n", inputs[0])
+		}
+	}
+	fmt.Printf("Connection from %v closed. \n", c.RemoteAddr())
+}
+
