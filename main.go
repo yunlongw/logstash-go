@@ -8,7 +8,7 @@ import (
 	"runtime"
 )
 
-func httpLogServer() {
+func httpLogServer(port string) {
 	http.HandleFunc("/write", func(w http.ResponseWriter, r *http.Request) {
 
 		//允许跨域访问
@@ -22,13 +22,12 @@ func httpLogServer() {
 		h.broadcast <- bodyByte
 	})
 
-	log.Println(">>> HTTP - POST至 http://ip:9192/write")
 	//开启 9090 端口监听
-	http.ListenAndServe(":9192", nil)
+	http.ListenAndServe(port, nil)
 }
 
-func udpLogServer() {
-	addr, err := net.ResolveUDPAddr("udp4", ":9093")
+func udpLogServer(port string) {
+	addr, err := net.ResolveUDPAddr("udp4", port)
 	if err != nil {
 		log.Printf("net.ResolveUDPAddr error %q", err)
 	}
@@ -39,7 +38,7 @@ func udpLogServer() {
 	}
 
 	defer l.Close()
-	log.Println(">>> UDP - 转发至 upd://ip:9093")
+
 	for {
 		buf := make([]byte, 40960)
 		length, _, err := l.ReadFrom(buf)
@@ -57,16 +56,23 @@ func udpLogServer() {
 
 func main() {
 	log.Println("LogStation started (v1.0.0) - ws://ip:9191")
+
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	//开始接收udp日志
-	go udpLogServer()
+	go udpLogServer(":9193")
+	log.Println(">>> UDP - 转发至 upd://ip:9193")
 
-	//开始接收HTTP日志,收到消息后发送广播
-	go httpLogServer()
-
+	//开始接收HTTP日志
+	go httpLogServer(":9192")
+	log.Println(">>> HTTP - POST至 http://ip:9192/write")
+	
 	//处理ws
 	go h.run()
+
+	//开始接受 websocket 日志
+	http.ListenAndServe(":9194",  http.HandlerFunc(wbServerHandler))
+	log.Println(">>> Websocket - 至 http://ip:9194/write")
 
 	//通过ws发送给客户端
 	http.ListenAndServe(":9191", http.HandlerFunc(wsHandler))

@@ -9,14 +9,17 @@ import (
 var count = 0
 
 type hub struct {
-	connections map[*connection]bool //连接
-	broadcast   chan []byte          //广播
-	register    chan *connection     //寄存器
-	unregister  chan *connection     //注销
+	connections    map[*connection]bool //连接
+	broadcast      chan []byte          //广播
+	register       chan *connection     //寄存器
+	registerServer chan *connection
+	unregister     chan *connection //注销
+	broadcastWeb chan []byte  //websocket 接收到的消息
 }
 
 var h = hub{
 	broadcast:   make(chan []byte),
+	broadcastWeb:   make(chan []byte),
 	register:    make(chan *connection),
 	unregister:  make(chan *connection),
 	connections: make(map[*connection]bool),
@@ -79,6 +82,16 @@ func (h *hub) run() {
 					close(c.send)
 				}
 			}
+
+		case wm := <-h.broadcastWeb:
+			//统计发送的数据数量
+			count = count + 1
+			//计算客户端数量
+			clientNum := len(h.connections)
+			log.Printf("广播第 %d 条消息, 共有 %d 个客户端", count, clientNum)
+			log.Println("---", string(wm), "---")
+
+
 		}
 	}
 }

@@ -1,10 +1,10 @@
 package main
 
 import (
-	"net"
-	"github.com/gobwas/ws/wsutil"
 	"github.com/gobwas/ws"
+	"github.com/gobwas/ws/wsutil"
 	"log"
+	"net"
 	"net/http"
 )
 
@@ -46,4 +46,35 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	c.write()
+}
+
+func wbServerHandler(w http.ResponseWriter, r *http.Request)  {
+	log.Println(">>> Websocket - 至 http://ip:9393/write")
+
+	conn, _, _, err := ws.UpgradeHTTP(r, w)
+	if err != nil {
+		// handle error
+	}
+	go func() {
+		defer conn.Close()
+
+		for {
+			msg, op, err := wsutil.ReadClientData(conn)
+			if err != nil {
+				// handle error
+				//fmt.Println(1)
+			}
+			err = wsutil.WriteServerMessage(conn, op, msg)
+			if err != nil {
+				// handle error
+				//fmt.Println(2)
+			}
+
+			h.broadcastWeb <- msg
+		}
+	}()
+
+	//bodyByte, _ := ioutil.ReadAll(r.Body)
+	//h.broadcast <- bodyByte
+
 }
