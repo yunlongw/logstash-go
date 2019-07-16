@@ -6,7 +6,7 @@
  * Time: 13:17
  */
 
-namespace App\Traits;
+namespace app\common\traits;
 
 
 /**
@@ -45,8 +45,9 @@ trait UdpLogTrait
      */
     public function connect()
     {
-        $this->server = env('UDP_LOG_SERVER') ?? "127.0.0.1";
-        $this->port = env('UDP_LOG_PORT') ?? "9091";
+
+        $this->server = config('udplog.UDP_LOG_SERVER') ?? "127.0.0.1";
+        $this->port = config('udplog.UDP_LOG_PORT') ?? "9091";
         $fp = fsockopen("udp://{$this->server}", $this->port, $error_no, $error_string);
         if (!$fp) {
             return;
@@ -127,37 +128,5 @@ trait UdpLogTrait
                 }
             }
         }
-    }
-
-
-    /**
-     * 格式化数组
-     *
-     * @param string $name
-     * @param array $data
-     * @param int $i
-     * @return string
-     */
-    function prettyArray($name, array $data, $i = 2)
-    {
-        $space = str_pad('', $i, ' ', STR_PAD_LEFT);
-        if (!empty($data)) {
-            array_walk($data, function (&$v, $k) use ($i, $space) {
-                if (is_array($v)) {
-                    $v = $space . self::prettyArray($k, $v, $i + 2);
-                } else {
-                    if (!is_int($k)) {
-                        $v = $k . ': ' . $v;
-                    }
-
-                    $v = $space . $v;
-                }
-            });
-        } else {
-            $data[] = $space . '-';
-        }
-
-        array_unshift($data, $name);
-        return implode(PHP_EOL, $data);
     }
 }

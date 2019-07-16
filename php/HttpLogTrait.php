@@ -9,6 +9,9 @@
 namespace app\common\traits;
 
 
+use think\Exception;
+use think\Log;
+
 trait HttpLogTrait
 {
     private $station_server;
@@ -25,8 +28,8 @@ trait HttpLogTrait
      */
     function connect()
     {
-        $this->station_server = env('HTTP_LOG_SERVER') ?? "127.0.0.1";
-        $this->port = env('HTTP_LOG_PORT') ?? "9091";
+        $this->station_server = \think\Env::get('logStation.host', '127.0.0.1');
+        $this->port = \think\Env::get('logStation.port', '9192');
 
         $fp = fsockopen($this->station_server, $this->port, $error_no, $error_string, $this->timeout);
         if (!$fp) {
@@ -47,23 +50,28 @@ trait HttpLogTrait
      */
     function write($log, $name = '')
     {
-        $this->connect();
-        if (is_resource($this->fp)) {
-            $log = $this->formatRemoteLog($log, $name);
-            $content_length = strlen($log);
-            $q = array(
-                'POST /write HTTP/1.1',
-                "Host: {$this->station_server}",
-                "User-Agent: LogStation Client",
-                "Content-Length: {$content_length}",
-                "Connection: Close\r\n",
-                $log
-            );
+        try{
+            $this->connect();
+            if (is_resource($this->fp)) {
+                $log = $this->formatRemoteLog($log, $name);
+                $content_length = strlen($log);
+                $q = array(
+                    'POST /write HTTP/1.1',
+                    "Host: {$this->station_server}",
+                    "User-Agent: LogStation Client",
+                    "Content-Length: {$content_length}",
+                    "Connection: Close\r\n",
+                    $log
+                );
 
-            $string = implode("\r\n", $q);
-            fwrite($this->fp, $string, 40960);
-            fclose($this->fp);
+                $string = implode("\r\n", $q);
+                fwrite($this->fp, $string, strlen($string));
+                fclose($this->fp);
+            }
+        }catch (Exception $e){
+            Log::write($e->getMessage(), Log::ERROR);
         }
+
     }
 
 
