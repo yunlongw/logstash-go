@@ -40,7 +40,7 @@
 <body>
 <div id="app">
 
-    <div class="panel panel-primary">
+    <div class="panel panel-primary" style="margin-bottom: 0" id="top">
         <div class="panel-heading">
             <h3 class="panel-title"> LogStation</h3>
         </div>
@@ -50,8 +50,7 @@
                     <div class="input-group-btn">
                         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action<span class="caret"></span></button>
                         <ul class="dropdown-menu">
-                            <li><a v-on:click="action($event, 'ws://13.229.127.162:9191')"> Aws Server </a></li>
-                            <li><a v-on:click="action($event, 'ws://118.24.73.104:9191')"> TX Server </a></li>
+                            <li><a v-on:click="action($event, 'ws://47.244.51.128:9191')"> 128 Server </a></li>
                         </ul>
                     </div>
                     <!-- /btn-group -->
@@ -71,13 +70,13 @@
         </div>
     </div>
 
-    <div id="message">
+    <div id="message" style="overflow:auto;height: 729px">
         <ul class="list-group">
             <li class="list-group-item" v-for="v in message" :key="v.id">
                 <span class="badge">{{ v.time }}</span>
                 <span class="badge text-info">{{ v.tag }}</span>
                 <div class="media">
-                    <div class="media-body">
+                    <div class="media-body" id="message_body">
                         <p>
                             {{ v.text }}
                         </p>
@@ -97,6 +96,15 @@
 </div>
 </body>
 <script>
+
+    $(function (e) {
+        var h = $(document).height();
+        var top = $('#top').height();
+        var foot = $('#footer').height();
+        var mesg = h - top - foot;
+        $('#message').attr('height', mesg + "px");
+    });
+
     $(document.body).css({
         "overflow-x": "hidden",
     });
@@ -139,7 +147,7 @@
                     };
 
                     ws.onmessage = function (event) {
-                        console.log(event.data);
+                        // console.log(event.data);
                         var tag = '';
                         var d = {};
                         var t = event.data;
@@ -174,6 +182,8 @@
                             time: data_message['current_time']
                         });
 
+
+
                         if (app.current_tag === '') {
                             app.message = app.message_data;
                         } else {
@@ -185,6 +195,14 @@
                                 });
                             }
                         }
+
+
+                        var scrollHeight = $('#message').prop("scrollHeight");
+                        console.log(scrollHeight)
+                        $('#message').scrollTop(scrollHeight);
+
+
+
                     };
 
                     ws.onclose = function (event) {
