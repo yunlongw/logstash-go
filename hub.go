@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"runtime"
+	"strings"
+	"time"
 )
 
 var count = 0
@@ -110,11 +112,17 @@ func (h *hub) run() {
 
 			if b == true {
 				s := string(m)
+				// 去除空格
+				s = strings.Replace(s, " ", "", -1)
+				// 去除换行符
+				s = strings.Replace(s, "\n", "", -1)
 				//default_json := strings.Join([]string{s},"")
-				//default_json := fmt.Sprintf("{\"%s\":\"%s\"}","error",s)
+				default_json := fmt.Sprintf("{\"name\":\"default_tag\",\"current_time\":\"%s\",\"data\":{\"info\":\"%s\"}}", time.Date(1991, time.August, 01, 0, 0, 0, 0, time.UTC), s)
 				default_json2 := "[]"
 
-				var data = &JsonData{Data: s, Get: default_json2, Post: default_json2, Cookie: default_json2, Session: default_json2}
+				//default_json := "{\"name\":\"default_tag\",\"current_time\":\"2019-08-02 15:40:00\",\"data\":{\"a\":\"test\"}}"
+
+				var data = &JsonData{Data: default_json, Get: default_json2, Post: default_json2, Cookie: default_json2, Session: default_json2}
 				d, _ := json.Marshal(data)
 
 				for c := range h.connections {

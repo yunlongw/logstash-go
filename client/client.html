@@ -155,6 +155,11 @@
                         var time = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
                         var match = JSON.parse(t);
                         var data = match['data'];
+                        console.log(data);
+
+                        // if (typeof JSON.parse(data) == "object") {
+                        //     return true;
+                        // }
 
                         var data_message = JSON.parse(data);
                         d.data = data_message['data'];
@@ -170,6 +175,8 @@
                         if (match.hasOwnProperty('session') && match['session'] !== '') {
                             d.session = match['session'];
                         }
+
+
                         tag = data_message['name'];
                         if (!tags[tag]) {
                             tags[tag] = tag;
