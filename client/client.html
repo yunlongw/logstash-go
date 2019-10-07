@@ -205,7 +205,8 @@
                         }
 
 
-                        var scrollHeight = $('#message').prop("scrollHeight");
+                        // var scrollHeight = $('#message').prop("scrollHeight");
+                        var scrollHeight = $('#message')[0].scrollHeight;
                         console.log(scrollHeight)
                         $('#message').scrollTop(scrollHeight);
 
