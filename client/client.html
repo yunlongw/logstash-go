@@ -143,6 +143,7 @@
                         app.showSuccess();
                         app.status = "连接成功";
                         if (storage) {
+                            console.log(event.data);
                             storage.setItem(strKey, app.server);
                         }
                     };
