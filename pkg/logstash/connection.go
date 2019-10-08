@@ -22,6 +22,7 @@ type Connection struct {
 func (c *Connection) write() {
 	for message := range c.send {
 		err := wsutil.WriteServerMessage(c.ws, ws.OpText, message)
+		fmt.Println(string(message))
 		if err != nil {
 			log.Printf("发送消息到 %s 出错 %q", c.ws.RemoteAddr(), err)
 			return
